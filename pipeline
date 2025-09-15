@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+     environment {
+      TERRAFORM_SERVER = 'root@172.31.42.47'
+       TF_DIR = '/root/automate'  // Or wherever your Terraform code is
+     }
+
+    stages {
+        stage('Validate Terraform') {
+            steps {
+             
+             sshagent (credentials: ['terraform-root-key']){
+            sh """ ssh ${TERRAFORM_SERVER} 'cd ${TF_DIR} && terraform validate' """
+             }
+            }
+        }
+
+        stage('Apply Terraform') {
+            steps {
+                
+                sshagent (credentials: ['terraform-root-key']){
+               sh """ ssh ${TERRAFORM_SERVER} 'cd ${TF_DIR} && terraform apply -auto-approve' """
+                }
+            }
+            
+        }
+        }
+        }
